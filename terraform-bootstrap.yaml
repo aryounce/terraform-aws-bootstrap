@@ -47,7 +47,7 @@ Parameters:
 
 Conditions:
 
-  HasSpecifiedS3BucketName:
+  HasSpecifiedS3BucketName: !Equals [ !Ref S3BucketName, "" ]
 
 
 Resources:
@@ -61,6 +61,7 @@ Resources:
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
+      BucketName: !If [ HasSpecifiedS3BucketName, !Ref S3BucketName, !Ref "AWS::NoValue" ]
       AccessControl: Private
       BucketEncryption:
         ServerSideEncryptionConfiguration:
@@ -125,7 +126,7 @@ Resources:
               - "s3:GetObject"
               - "s3:PutObject"
               - "s3:DeleteObject"
-            Resource: !Sub "${Bucket.Arn}/terraform-state/*"
+            Resource: !Sub "${Bucket.Arn}/${S3StatePrefix}/*"
           - Sid: "Locking"
             Effect: Allow
             Action:
