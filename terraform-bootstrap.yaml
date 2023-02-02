@@ -52,11 +52,11 @@ Rules:
         AssertDescription: >-
           The S3 prefix for state objects may not be blank.
 
-  LockTableNameConstraint:
+  LockingTableNameConstraint:
     Assertions:
       - Assert: !Not [ !Equals [ !Ref DynamoDbTableName, "" ] ]
         AssertDescription: >-
-          The DynamoDB table name for locking may not be blank.
+          The name for the DynamoDB locking table may not be blank.
 
 
 Conditions:
