@@ -15,9 +15,8 @@ Description: "Bootstrap the Terraform S3 Backend"
 # where would the state for these resources reside? This CloudFormation stack
 # serves to solve that problem.
 #
-# Note that this template has been kept as simple as possible to ease bootstrapping
-# Terraform in AWS. One caveat is that should this CloudFormation stack be deleted
-# the S3 bucket and DynamoDB table it defines will be retained for safety's sake.
+# Note  that should this CloudFormation stack be deleted the S3 bucket and
+# DynamoDB table it defines will be retained for safety's sake.
 #
 
 Parameters:
@@ -43,6 +42,21 @@ Parameters:
     Description: >-
       Name for the DynamocDB table created to lock Terraform state.
     Default: "terraform-locking"
+
+
+Rules:
+
+  StatePrefixConstraint:
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref S3StatePrefix, "" ] ]
+        AssertDescription: >-
+          The S3 prefix for state objects may not be blank.
+
+  LockTableNameConstraint:
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref DynamoDbTableName, "" ] ]
+        AssertDescription: >-
+          The DynamoDB table name for locking may not be blank.
 
 
 Conditions:
