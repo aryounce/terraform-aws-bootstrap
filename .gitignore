@@ -1,3 +1,6 @@
+# macOS debris
+.DS_Store
+
 # Local .terraform directories
 **/.terraform/*
 
