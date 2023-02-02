@@ -15,7 +15,7 @@ Description: "Bootstrap the Terraform S3 Backend"
 # where would the state for these resources reside? This CloudFormation stack
 # serves to solve that problem.
 #
-# Note  that should this CloudFormation stack be deleted the S3 bucket and
+# Note that should this CloudFormation stack be deleted the S3 bucket and
 # DynamoDB table it defines will be retained for safety's sake.
 #
 
