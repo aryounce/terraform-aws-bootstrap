@@ -4,14 +4,50 @@ Description: "Bootstrap the Terraform S3 Backend"
 
 #
 # This CloudFormation stack template initializes all of the resources necessary
-# to utilize the Terraform S3 backend. See;
-# https://www.terraform.io/language/settings/backends/s3 (and, specifically for locking)
-# https://www.terraform.io/language/settings/backends/s3#dynamodb-state-locking
+# to utilize the Terraform S3 backend, see;
+# https://www.terraform.io/language/settings/backends/s3
+#
+# These resources are meant to reside in what the Terraform documentation refers
+# to as an "administrative AWS account". See;
+# https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture
+#
+# There is a chicken-and-egg problem with using Terraform to bootstrap itself;
+# where would the state for these resources reside? This CloudFormation stack
+# serves to solve that problem.
 #
 # Note that this template has been kept as simple as possible to ease bootstrapping
 # Terraform in AWS. One caveat is that should this CloudFormation stack be deleted
 # the S3 bucket and DynamoDB table it defines will be retained for safety's sake.
 #
+
+Parameters:
+
+  #
+  # If the `S3BucketName` parameter is left empty then a random name will be
+  # generated that uses this CloudFormation stack's name as a prefix.
+  #
+  S3BucketName:
+    Type: String
+    Description: >-
+      Name for the S3 bucket created to store Terraform state.
+    Default: ""
+
+  S3StatePrefix:
+    Type: String
+    Description: >-
+      Prefix within the S3 bucket to store Terraform state.
+    Default: "terraform-state"
+
+  DynamoDbTableName:
+    Type: String
+    Description: >-
+      Name for the DynamocDB table created to lock Terraform state.
+    Default: "terraform-locking"
+
+
+Conditions:
+
+  HasSpecifiedS3BucketName:
 
 
 Resources:
@@ -42,12 +78,17 @@ Resources:
   # The backend can use a DynamoDB table for locking to prevent races between
   # different instances of Terraform.
   #
+  # The layout of this table is buried in the S3 backend documentation, see;
+  # https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-state-locking
+  #
+  # TLDR; "The table must have a partition key named LockID with type of String."
+  #
   DynamoTable:
     Type: AWS::DynamoDB::Table
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
-      TableName: terraform-locking
+      TableName: !Ref DynamoDbTableName
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       BillingMode: PAY_PER_REQUEST
@@ -62,7 +103,7 @@ Resources:
 
   #
   # Attach this policy to an IAM user, group, or role to enable access to the S3
-  # backend. See;
+  # backend, see;
   # https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html
   #
   Policy:
@@ -84,7 +125,7 @@ Resources:
               - "s3:GetObject"
               - "s3:PutObject"
               - "s3:DeleteObject"
-            Resource: !Sub "${Bucket.Arn}/tf/state/*"
+            Resource: !Sub "${Bucket.Arn}/terraform-state/*"
           - Sid: "Locking"
             Effect: Allow
             Action:
