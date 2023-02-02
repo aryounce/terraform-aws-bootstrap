@@ -47,7 +47,7 @@ Parameters:
 
 Conditions:
 
-  HasSpecifiedS3BucketName: !Equals [ !Ref S3BucketName, "" ]
+  HasSpecifiedS3BucketName: !Not [ !Equals [ !Ref S3BucketName, "" ] ]
 
 
 Resources:
