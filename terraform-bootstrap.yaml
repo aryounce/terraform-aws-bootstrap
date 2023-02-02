@@ -1,0 +1,115 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Bootstrap the Terraform S3 Backend"
+
+#
+# This CloudFormation stack template initializes all of the resources necessary
+# to utilize the Terraform S3 backend. See;
+# https://www.terraform.io/language/settings/backends/s3 (and, specifically for locking)
+# https://www.terraform.io/language/settings/backends/s3#dynamodb-state-locking
+#
+# Note that this template has been kept as simple as possible to ease bootstrapping
+# Terraform in AWS. One caveat is that should this CloudFormation stack be deleted
+# the S3 bucket and DynamoDB table it defines will be retained for safety's sake.
+#
+
+
+Resources:
+
+  #
+  # Stores the Terraform state. This bucket may be used as the backend for more
+  # than one remote state instance.
+  #
+  Bucket:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  #
+  # The backend can use a DynamoDB table for locking to prevent races between
+  # different instances of Terraform.
+  #
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TableName: terraform-locking
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+
+  #
+  # Attach this policy to an IAM user, group, or role to enable access to the S3
+  # backend. See;
+  # https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html
+  #
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Terraform S3 backend access."
+      ManagedPolicyName: "Terraform-S3-Backend"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Bucket"
+            Effect: Allow
+            Action:
+              - "s3:ListBucket"
+            Resource: !GetAtt Bucket.Arn
+          - Sid: "StateAccess"
+            Effect: Allow
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:DeleteObject"
+            Resource: !Sub "${Bucket.Arn}/tf/state/*"
+          - Sid: "Locking"
+            Effect: Allow
+            Action:
+              - "dynamodb:GetItem"
+              - "dynamodb:PutItem"
+              - "dynamodb:DeleteItem"
+            Resource: !GetAtt DynamoTable.Arn
+
+
+Outputs:
+
+  Bucket:
+    Description: Terrafom state S3 bucket
+    Value: !Ref Bucket
+    Export:
+      Name: !Sub "${AWS::StackName}:bucket-name"
+
+  LockTable:
+    Description: Terraform state lock table
+    Value: !GetAtt DynamoTable.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}:dynamo-table-arn"
+
+  Policy:
+    Description: IAM policy used to access Terraform state
+    Value: !Ref Policy
+    Export:
+      Name: !Sub "${AWS::StackName}:policy-arn"
