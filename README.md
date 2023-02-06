@@ -39,8 +39,10 @@ Using Terraform to initialize the S3 backend is possible, and if you absolutely 
 
 ### Caveats
 
-- When setting up the S3 backend using Terraform the state is stored locally and must be migrated into the backend afterwards. This stores the backend resources state in S3, but makes it possible to [accidentally delete all Terraform state](https://stackoverflow.com/questions/54122890/terraform-fails-because-tfstate-s3-backend-is-lost) as a result.
+- When setting up the S3 backend using Terraform the state is stored locally and must be [migrated into the backend afterwards](https://developer.hashicorp.com/terraform/cli/commands/init#backend-initialization).
+- Storing the backend resources state in the backend itself makes it possible to [accidentally delete all Terraform state](https://stackoverflow.com/questions/54122890/terraform-fails-because-tfstate-s3-backend-is-lost) as a result.
 
 ## Related Reading
 
 - [Terraform S3 Backend Best Practices](https://technology.doximity.com/articles/terraform-s3-backend-best-practices)
+- [S3 Terraform Backend setup via Terraform](https://earthly.dev/blog/terraform-state-bucket/)
