@@ -44,4 +44,5 @@ Using Terraform to initialize the S3 backend is possible and if you absolutely c
 
 ## Related Reading
 
+- [Terraform Backend Configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
 - [Terraform S3 Backend Best Practices](https://technology.doximity.com/articles/terraform-s3-backend-best-practices)
