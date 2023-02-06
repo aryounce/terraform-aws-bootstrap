@@ -6,7 +6,7 @@ The included CloudFormation stack template solves the chicken-and-egg problem wi
 
 ## Installation
 
-Using appropriate AWS credentials, run the following:
+Using appropriate AWS credentials for your "administrative" account, run the following:
 
 ```
 aws cloudformation deploy --stack-name terraform-bootstrap --template-file terraform-bootstrap.yaml --capabilities CAPABILITY_NAMED_IAM
