@@ -23,7 +23,7 @@
 echo "# Generating Terraform HCL for S3 backend" >> /dev/stderr
 
 # TODO Document
-state_key_default=terraform
+state_key_default="terraform"
 state_key="${1-$state_key_default}"
 
 [[ "${state_key}" == "${state_key_default}" ]] && \
@@ -38,9 +38,9 @@ stack_name="${2-$stack_name_default}"
 aws cloudformation describe-stacks --stack-name "${stack_name}" | \
 jq -r --arg state_key "${state_key}" $'"terraform {
   backend \\"s3\\" {
+    region         = \\"\(.Stacks[0] | .StackId | split(":")[3])\\"
     bucket         = \\"\(.Stacks[0] | .Outputs[] | select(.OutputKey == "Bucket") | .OutputValue)\\"
     key            = \\"\(.Stacks[0] | .Parameters[] | select(.ParameterKey == "S3StatePrefix") | .ParameterValue)/\($state_key).tfstate\\"
-    region         = \\"\(.Stacks[0] | .StackId | split(":")[3])\\"
     dynamodb_table = \\"\(.Stacks[0] | .Parameters[] | select(.ParameterKey == "DynamoDbTableName") | .ParameterValue)\\"
     # Use of S3 bucket encryption must be enable by the user.
     #encrypt        = true
