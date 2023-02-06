@@ -29,9 +29,17 @@ terraform {
 
 Alternately you may use the included [`generate-backend-hcl.sh`](generate-backend-hcl.sh) script, which will pull the needed values from CloudFormation and generate a proper configuration for you. See the header comment of the script for more information.
 
-## Why Not Use Terraform instead?
+### IAM permission considerations when using the S3 backend
 
 TODO
+
+## Why Not Use Terraform instead?
+
+Using Terraform to initialize the S3 backend is possible, and if you absolutely cannot tolerate CloudFormation in your environment (for whatever reason) then there are alternatives to the approach this project takes.
+
+### Caveats
+
+- When setting up the S3 backend using Terraform the state is stored locally and must be migrated into the backend afterwards. This stores the backend resources state in S3, but makes it possible to [accidentally delete all Terraform state](https://stackoverflow.com/questions/54122890/terraform-fails-because-tfstate-s3-backend-is-lost) as a result.
 
 ## Related Reading
 
