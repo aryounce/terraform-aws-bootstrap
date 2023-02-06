@@ -29,13 +29,13 @@ terraform {
 
 Alternately you may use the included [`generate-backend-hcl.sh`](generate-backend-hcl.sh) script, which will pull the needed values from CloudFormation and generate a proper configuration for you. See the header comment of the script for more information.
 
-### IAM permission considerations when using the S3 backend
+### IAM permission considerations when managing other AWS accounts
 
 TODO
 
 ## Why Not Use Terraform instead?
 
-Using Terraform to initialize the S3 backend is possible, and if you absolutely cannot tolerate CloudFormation in your environment (for whatever reason) then there are alternatives to the approach this project takes.
+Using Terraform to initialize the S3 backend is possible and if you absolutely cannot tolerate CloudFormation in your environment (for whatever reason) then there are [alternatives](https://earthly.dev/blog/terraform-state-bucket/) to the approach this project takes.
 
 ### Caveats
 
@@ -45,4 +45,3 @@ Using Terraform to initialize the S3 backend is possible, and if you absolutely 
 ## Related Reading
 
 - [Terraform S3 Backend Best Practices](https://technology.doximity.com/articles/terraform-s3-backend-best-practices)
-- [S3 Terraform Backend setup via Terraform](https://earthly.dev/blog/terraform-state-bucket/)
