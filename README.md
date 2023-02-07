@@ -16,7 +16,7 @@ aws cloudformation deploy --stack-name terraform-bootstrap --template-file terra
 
 All that is left to do is create your [Terraform configuration utilizing the newly initialized backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3#configuration) for state. This looks something like:
 
-```
+```hcl
 terraform {
   backend "s3" {
     bucket         = "terraform-bootstrap-bucket-XXXXXXXXXXXXX"
@@ -29,9 +29,11 @@ terraform {
 
 Alternately you may use the included [`generate-backend-hcl.sh`](generate-backend-hcl.sh) script, which will pull the needed values from CloudFormation and generate a proper configuration for you. See the header comment of the script for more information.
 
-### IAM permission considerations when managing other AWS accounts
+### IAM Authentication Considerations
 
-TODO
+When using the S3 backend to store state for managing other AWS accounts you will need to authenticate against both the administrative AWS account (which contains the state) and the AWS account you wish to manage. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
+
+See the supplementary document: [IAM Authentication when using the Terraform S3 Backend](docs/S3-Backend-With-IAM.md)
 
 ## Why Not Use Terraform instead?
 
