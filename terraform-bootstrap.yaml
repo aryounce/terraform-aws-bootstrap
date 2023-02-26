@@ -179,8 +179,10 @@ Resources:
         Bucket used for Terraform S3 backend deployment(s).
       Name: !Sub "/${ParameterPrefix}/s3-backend-bucket"
       Tags:
-        - Key: application
-          Value: "Terraform S3 Backend"
+        # Parameter Store parameters have a different tag format than most
+        # other AWS resources created via CloudFormation. See;
+        # https://stackoverflow.com/questions/69718237/property-validation-failure-value-of-property-tags-does-not-match-type-map
+        application: "Terraform S3 Backend"
       Tier: Standard
       Type: "String"
       Value: !Ref Bucket
@@ -192,8 +194,10 @@ Resources:
         DynamoDB locking table used for Terraform S3 backend deployment(s).
       Name: !Sub "/${ParameterPrefix}/s3-backend-lock-table"
       Tags:
-        - Key: application
-          Value: "Terraform S3 Backend"
+        # Parameter Store parameters have a different tag format than most
+        # other AWS resources created via CloudFormation. See;
+        # https://stackoverflow.com/questions/69718237/property-validation-failure-value-of-property-tags-does-not-match-type-map
+        - application: "Terraform S3 Backend"
       Tier: Standard
       Type: "String"
       Value: !Ref DynamoTable
