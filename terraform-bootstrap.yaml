@@ -11,10 +11,6 @@ Description: "Bootstrap the Terraform S3 Backend"
 # to as an "administrative AWS account". See;
 # https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture
 #
-# There is a chicken-and-egg problem with using Terraform to bootstrap itself;
-# where would the state for these resources reside? This CloudFormation stack
-# serves to solve that problem.
-#
 # Note that should this CloudFormation stack be deleted the S3 bucket and
 # DynamoDB table it defines will be retained for safety's sake.
 #
@@ -42,6 +38,18 @@ Parameters:
     Description: >-
       Name for the DynamocDB table created to lock Terraform state.
     Default: "terraform-locking"
+
+  #
+  # To ensure that the S3 bucket and DynamoDB table are discoverable by scripts
+  # and other forms of automation we put their names into well known locations in
+  # Parameter Store.
+  #
+  ParameterPrefix:
+    Type: String
+    Description: >-
+      Prefix (without a leading '/'') for Parameters Store values that can be used
+      to discover the resources in this stack for the purpose of HCL generation, etc.
+    Default: "terraform"
 
 
 Rules:
@@ -88,6 +96,9 @@ Resources:
         RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
+      Tags:
+        - Key: application
+          Value: "Terraform S3 Backend"
 
   #
   # The backend can use a DynamoDB table for locking to prevent races between
@@ -115,6 +126,9 @@ Resources:
           KeyType: HASH
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: application
+          Value: "Terraform S3 Backend"
 
   #
   # Attach this policy to an IAM user, group, or role to enable access to the S3
@@ -148,6 +162,41 @@ Resources:
               - "dynamodb:PutItem"
               - "dynamodb:DeleteItem"
             Resource: !GetAtt DynamoTable.Arn
+          - Sid: "Parameters"
+            Effect: Allow
+            Action:
+              - "DescribeParameters"
+              - "GetParameter"
+              - "GetParameterHistory"
+              - "GetParameters"
+              - "GetParametersByPath"
+            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParameterPrefix}"
+
+  S3BucketParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: >-
+        Bucket used for Terraform S3 backend deployment(s).
+      Name: !Sub "/${ParameterPrefix}/s3-backend-bucket"
+      Tags:
+        - Key: application
+          Value: "Terraform S3 Backend"
+      Tier: Standard
+      Type: "String"
+      Value: !Ref Bucket
+
+  DynamoTableParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: >-
+        DynamoDB locking table used for Terraform S3 backend deployment(s).
+      Name: !Sub "/${ParameterPrefix}/s3-backend-lock-table"
+      Tags:
+        - Key: application
+          Value: "Terraform S3 Backend"
+      Tier: Standard
+      Type: "String"
+      Value: !Ref DynamoTable
 
 
 Outputs:
