@@ -197,7 +197,7 @@ Resources:
         # Parameter Store parameters have a different tag format than most
         # other AWS resources created via CloudFormation. See;
         # https://stackoverflow.com/questions/69718237/property-validation-failure-value-of-property-tags-does-not-match-type-map
-        - application: "Terraform S3 Backend"
+        application: "Terraform S3 Backend"
       Tier: Standard
       Type: "String"
       Value: !Ref DynamoTable
