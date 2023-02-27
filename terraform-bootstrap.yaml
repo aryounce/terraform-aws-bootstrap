@@ -165,11 +165,11 @@ Resources:
           - Sid: "Parameters"
             Effect: Allow
             Action:
-              - "DescribeParameters"
-              - "GetParameter"
-              - "GetParameterHistory"
-              - "GetParameters"
-              - "GetParametersByPath"
+              - "ssm:DescribeParameters"
+              - "ssm:GetParameter"
+              - "ssm:GetParameterHistory"
+              - "ssm:GetParameters"
+              - "ssm:GetParametersByPath"
             Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParameterPrefix}"
 
   S3BucketParameter:
