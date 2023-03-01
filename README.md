@@ -6,9 +6,7 @@ The included Terraform and CloudFormation templates solve the chicken-and-egg pr
 
 ## Setup
 
-Either the Terraform or CloudFormation template may be used to setup the backend as they are equivalent.
-
-Using appropriate AWS credentials for your "administrative" account, do the following:
+Either the Terraform or CloudFormation template may be used to setup the backend as they are equivalent. Using appropriate AWS credentials for your "administrative" account, do the following:
 
 ### Via Terraform
 
