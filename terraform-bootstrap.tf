@@ -1,7 +1,5 @@
 /*
- * All variables are optional. It should be noted that if you do not provide a
- * name for the S3 bucket then Terraform will assign a random, unique name. See;
- * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket#bucket
+ * All variables are optional.
  */
 
 variable "aws_region" {
@@ -9,6 +7,11 @@ variable "aws_region" {
   default = null
 }
 
+/*
+ * It should be noted that if you do not provide a name for the S3 bucket then
+ * Terraform will assign a random, unique name. See;
+ * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket#bucket
+ */
 variable "s3_bucket_name" {
   type = string
 }
@@ -18,13 +21,18 @@ variable "dynamo_table_name" {
   default = "terraform-locking"
 }
 
+/*
+ * SSM Parameter Store values are created to provide a well-known place for
+ * scripts and other automation to retieve the S3 bucket name and DynamocDB table
+ * name.
+ */
 variable "parameter_prefix" {
   type    = string
   default = "terraform"
 }
 
 /*
- * The 'aws' provider will use the various `AWS_*` environment variables expected
+ * The `aws` provider will use the various `AWS_*` environment variables expected
  * by the AWS CLI and SDKs. See;
  * https://registry.terraform.io/providers/hashicorp/aws/latest/docs#environment-variables
  * https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference
