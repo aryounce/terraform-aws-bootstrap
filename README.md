@@ -2,11 +2,29 @@
 
 Quickly get started with the [Terraform S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 
-The included CloudFormation stack template solves the chicken-and-egg problem with the Terraform S3 backend by setting up all of the resources needed in the "administrative AWS account" so that Terraform may be used safely in a [multi-account, multi-user setup](https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture).
+The included Terraform and CloudFormation templates solve the chicken-and-egg problem with the Terraform S3 backend by setting up all of the resources needed in the "administrative AWS account" so that Terraform may be used safely in a [multi-account, multi-user setup](https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture).
 
-## Installation
+## Setup
 
-Using appropriate AWS credentials for your "administrative" account, run the following:
+Either the Terraform or CloudFormation template may be used to setup the backend as they are equivalent.
+
+Using appropriate AWS credentials for your "administrative" account, do the following:
+
+### Via Terraform
+
+Use the [Terraform template](terraform-bootstrap.tf) when you wish to manage everything in your AWS acccount(s) with Terraform. Additional steps are required to import the local state created when setting up the S3 backend.
+
+See: [S3 backend setup via Terraform](docs/Setup-via-Terraform.md)
+
+```shell
+terraform apply
+```
+
+### Via CloudFormation
+
+Use the [CloudFormation template](terraform-bootstrap.yaml) when either you don't intend to manage you AWS resources with Terraform, but wish to store your state in S3, or you wish to keep your backend resources outside of your Terraform state.
+
+See: [S3 backend setup via CloudFormation](docs/Setup-via-CloudFormation.md)
 
 ```
 aws cloudformation deploy --stack-name terraform-bootstrap --template-file terraform-bootstrap.yaml --capabilities CAPABILITY_NAMED_IAM
@@ -14,7 +32,11 @@ aws cloudformation deploy --stack-name terraform-bootstrap --template-file terra
 
 ## Usage
 
-All that is left to do is create your [Terraform configuration utilizing the newly initialized backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3#configuration) for state. This looks something like:
+After setup you must create your [Terraform configuration utilizing the newly initialized backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3#configuration) for state.
+
+The included [`generate-backend-hcl.sh`](generate-backend-hcl.sh) script will pull the needed values from your administrative AWS account and generate a proper configuration for you. See the header comment of the script for more information.
+
+### Terraform Backend Configuration Example
 
 ```hcl
 terraform {
@@ -27,22 +49,11 @@ terraform {
 }
 ```
 
-Alternately you may use the included [`generate-backend-hcl.sh`](generate-backend-hcl.sh) script, which will pull the needed values from CloudFormation and generate a proper configuration for you. See the header comment of the script for more information.
+### IAM Authentication for Multiple AWS Accounts
 
-### IAM Authentication Considerations
-
-When using the S3 backend to store state for managing other AWS accounts you will need to authenticate against both the administrative AWS account (which contains the state) and the AWS account you wish to manage. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
+When using the S3 backend to store state for managing multiple AWS accounts you will need to authenticate against both the administrative AWS account (which contains the state) and the AWS account you wish to manage. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
 
 See the supplementary document: [IAM Authentication when using the Terraform S3 Backend](docs/S3-Backend-With-IAM.md)
-
-## Why Not Use Terraform instead?
-
-Using Terraform to initialize the S3 backend is possible and if you absolutely cannot tolerate CloudFormation in your environment (for whatever reason) then there are [alternatives](https://earthly.dev/blog/terraform-state-bucket/) to the approach this project takes.
-
-### Caveats
-
-- When setting up the S3 backend using Terraform the state is stored locally and must be [migrated into the backend afterwards](https://developer.hashicorp.com/terraform/cli/commands/init#backend-initialization) (unless you wish to store the backend's state locally).
-- Migrating the backend resources state into the backend itself makes it easier to [accidentally delete all Terraform state](https://stackoverflow.com/questions/54122890/terraform-fails-because-tfstate-s3-backend-is-lost) as a result.
 
 ## Related Reading
 
