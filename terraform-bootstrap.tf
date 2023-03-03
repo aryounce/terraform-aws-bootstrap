@@ -81,7 +81,7 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [ "read_capacity", "write_capacity" ]
+    ignore_changes = [ read_capacity, write_capacity ]
   }
 }
 
