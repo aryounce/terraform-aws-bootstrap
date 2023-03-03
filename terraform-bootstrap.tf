@@ -1,10 +1,19 @@
 /*
+ * This Terraform configuration initializes all of the resources necessary to
+ * utilize the Terraform S3 backend, see;
+ * https://www.terraform.io/language/settings/backends/s3
+ *
+ * These resources are meant to reside in what the Terraform documentation refers
+ * to as an "administrative AWS account". See;
+ * https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture
+ *
  * All variables are optional.
  */
 
 variable "aws_region" {
   type    = string
   default = null
+  description = "AWS region for the backend resources. Will default to the session region."
 }
 
 /*
@@ -14,11 +23,14 @@ variable "aws_region" {
  */
 variable "s3_bucket_name" {
   type = string
+  default = null
+  description = "Name for the S3 bucket created to store Terraform state."
 }
 
 variable "dynamo_table_name" {
   type    = string
   default = "terraform-locking"
+  description = "Name for the DynamocDB table created to lock Terraform state."
 }
 
 /*
@@ -77,8 +89,7 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
   name     = var.dynamo_table_name
   hash_key = "LockID"
 
-  read_capacity  = 1
-  write_capacity = 1
+  billing_mode = "PAY_PER_REQUEST"
 
   attribute {
     name = "LockID"
@@ -92,13 +103,14 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [read_capacity, write_capacity]
   }
 }
 
+
 /*
- * The S3 bucket and DynamoDB table names are store in well-known locations in
- * SSM Parameter Store to make thier use by automation simpler.
+ * To ensure that the S3 bucket and DynamoDB table are discoverable by scripts
+ * and other forms of automation we put their names into well known locations in
+ * Parameter Store.
  */
 
 resource "aws_ssm_parameter" "terraform_state_bucket" {
