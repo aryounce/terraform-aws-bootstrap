@@ -39,7 +39,18 @@ variable "parameter_prefix" {
  *
  * Modify this section as needed.
  */
-provider "aws" {}
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.57.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
 
 resource "aws_s3_bucket" "terraform_state_bucket" {
   bucket = can(var.s3_bucket_name) ? var.s3_bucket_name : null
