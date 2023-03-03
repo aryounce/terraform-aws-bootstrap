@@ -1,4 +1,4 @@
-<img src="docs/banner.jpg" alt="Terraform Bootstrap for AWS">
+<img src="docs/banner-2.jpg" alt="Terraform Bootstrap for AWS">
 
 Quickly get started with the [Terraform S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 
