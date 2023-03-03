@@ -84,3 +84,22 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
     ignore_changes = [ "read_capacity", "write_capacity" ]
   }
 }
+
+/*
+ * The S3 bucket and DynamoDB table names are store in well-known locations in
+ * SSM Parameter Store to make thier use by automation simpler.
+ */
+
+resource "aws_ssm_parameter" "terraform_state_bucket" {
+  name        = "/${var.parameter_prefix}/s3-backend-bucket"
+  type        = "String"
+  description = "Bucket used for Terraform S3 backend deployment(s)."
+  value       = aws_s3_bucket.terraform_state_bucket.id
+}
+
+resource "aws_ssm_parameter" "terraform_lock_table" {
+  name        = "/${var.parameter_prefix}/s3-backend-lock-table"
+  type        = "String"
+  description = "DynamoDB locking table used for Terraform S3 backend deployment(s)."
+  value       = aws_dynamodb_table.terraform_lock_table.id
+}
