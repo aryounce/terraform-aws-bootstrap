@@ -95,6 +95,10 @@ resource "aws_ssm_parameter" "terraform_state_bucket" {
   type        = "String"
   description = "Bucket used for Terraform S3 backend deployment(s)."
   value       = aws_s3_bucket.terraform_state_bucket.id
+
+  tags = {
+    application = "Terraform S3 Backend"
+  }
 }
 
 resource "aws_ssm_parameter" "terraform_lock_table" {
@@ -102,4 +106,8 @@ resource "aws_ssm_parameter" "terraform_lock_table" {
   type        = "String"
   description = "DynamoDB locking table used for Terraform S3 backend deployment(s)."
   value       = aws_dynamodb_table.terraform_lock_table.id
+
+  tags = {
+    application = "Terraform S3 Backend"
+  }
 }
