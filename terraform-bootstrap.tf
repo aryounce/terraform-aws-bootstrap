@@ -63,8 +63,8 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 }
 
 resource "aws_dynamodb_table" "terraform_lock_table" {
-  name           = var.dynamo_table_name
-  hash_key       = "LockID"
+  name     = var.dynamo_table_name
+  hash_key = "LockID"
 
   read_capacity  = 1
   write_capacity = 1
@@ -81,7 +81,7 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [ read_capacity, write_capacity ]
+    ignore_changes  = [read_capacity, write_capacity]
   }
 }
 
