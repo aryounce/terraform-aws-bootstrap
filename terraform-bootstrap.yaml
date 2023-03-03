@@ -170,7 +170,7 @@ Resources:
               - "ssm:GetParameterHistory"
               - "ssm:GetParameters"
               - "ssm:GetParametersByPath"
-            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParameterPrefix}"
+            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParameterPrefix}/*"
 
   S3BucketParameter:
     Type: AWS::SSM::Parameter
