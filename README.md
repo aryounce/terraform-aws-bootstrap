@@ -25,7 +25,10 @@ Use the [CloudFormation template](terraform-bootstrap.yaml) when either you don'
 For full instructions, see: [S3 backend setup via CloudFormation](docs/Setup-via-CloudFormation.md)
 
 ```
-aws cloudformation deploy --stack-name terraform-bootstrap --template-file terraform-bootstrap.yaml --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation deploy \
+  --stack-name terraform-bootstrap \
+  --template-file terraform-bootstrap.yaml \
+  --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ## Usage
