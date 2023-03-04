@@ -64,6 +64,13 @@ provider "aws" {
   region = var.aws_region
 }
 
+/*
+ * Make the region and account ID available for use in resource parameters
+ * (such as the managed IAM policy).
+ */
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "terraform_state_bucket" {
   bucket = can(var.s3_bucket_name) ? var.s3_bucket_name : null
 
@@ -106,6 +113,62 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
   }
 }
 
+/*
+ * Attach this policy to an IAM user, group, or role to enable access to the S3
+ * backend, see;
+ * https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html
+ */
+resource "aws_iam_policy" "terraform_s3_backend_policy" {
+  name        = "Terraform-S3-Backend"
+  description = "Terraform S3 backend access."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "Bucket"
+        Effect   = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.terraform_state_bucket.arn
+      },
+      {
+        Sid = "StateAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.terraform_state_bucket.arn}/*"
+      },
+      {
+        Sid = "Locking"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
+        ]
+        Resource = aws_dynamodb_table.terraform_lock_table.arn
+      },
+      {
+        Sid = "Parameters"
+        Effect = "Allow"
+        Action = [
+          "ssm:DescribeParameters",
+          "ssm:GetParameter",
+          "ssm:GetParameterHistory",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ]
+        // TODO Fix this to use the specified region and fall back to the "current"
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${var.parameter_prefix}/*"
+      }
+    ]
+  })
+}
 
 /*
  * To ensure that the S3 bucket and DynamoDB table are discoverable by scripts
