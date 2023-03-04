@@ -1,4 +1,4 @@
-<img src="docs/banner-2.jpg" alt="Terraform Bootstrap for AWS">
+<img src="docs/banner.png" alt="Terraform Bootstrap for AWS">
 
 Quickly get started with the [Terraform S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 
@@ -25,7 +25,10 @@ Use the [CloudFormation template](terraform-bootstrap.yaml) when either you don'
 For full instructions, see: [S3 backend setup via CloudFormation](docs/Setup-via-CloudFormation.md)
 
 ```
-aws cloudformation deploy --stack-name terraform-bootstrap --template-file terraform-bootstrap.yaml --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation deploy \
+  --stack-name terraform-bootstrap \
+  --template-file terraform-bootstrap.yaml \
+  --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ## Usage
