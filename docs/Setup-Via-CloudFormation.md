@@ -2,7 +2,7 @@
 
 Setup and customize the Terraform S3 backend with through CloudFormation. This method is best suited for situations where you do not wish to manage your AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
 
-Using the AWS Command Line Interface run the following for the default setup:
+Using the [AWS Command Line Interface](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudformation/deploy.html) run the following for the default setup:
 
 ```
 aws cloudformation deploy \
