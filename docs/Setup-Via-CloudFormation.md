@@ -29,4 +29,4 @@ Specify `DynamoDbTableName=my-table-name` to override the default [DynamoDB tabl
 
 ### SSM Parameter Store Prefix
 
-Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table. Specify `"ParameterPrefix=my/param/prefix"` (note the omitted leading `/`).
+Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table. Set to `/terraform` by default, you may customize this to be `/my/param/prefix` by specifying `"ParameterPrefix=my/param/prefix"` (note the omitted leading `/`).
