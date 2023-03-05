@@ -12,7 +12,7 @@ Either the Terraform or CloudFormation template may be used to setup the backend
 
 Use the [Terraform template](terraform-bootstrap.tf) when you wish to manage everything in your AWS acccount(s) with Terraform. Additional steps are required to import the local state created when setting up the S3 backend.
 
-For full instructions, see: [S3 backend setup via Terraform](docs/Setup-via-Terraform.md)
+For full instructions, see: [S3 backend setup via Terraform](docs/Setup-Via-Terraform.md)
 
 ```shell
 terraform apply
@@ -22,7 +22,7 @@ terraform apply
 
 Use the [CloudFormation template](terraform-bootstrap.yaml) when either you don't intend to manage you AWS resources with Terraform, but wish to store your state in S3, or you wish to keep your backend resources outside of your Terraform state.
 
-For full instructions, see: [S3 backend setup via CloudFormation](docs/Setup-via-CloudFormation.md)
+For full instructions, see: [S3 backend setup via CloudFormation](docs/Setup-Via-CloudFormation.md)
 
 ```
 aws cloudformation deploy \
