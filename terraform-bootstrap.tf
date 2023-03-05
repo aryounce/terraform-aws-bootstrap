@@ -40,7 +40,7 @@ variable "dynamo_table_name" {
  */
 variable "parameter_prefix" {
   type    = string
-  default = "terraform"
+  default = "terraform-state"
 }
 
 /*
