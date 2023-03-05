@@ -18,7 +18,7 @@ The following list of IAM credential sources, and their resolution order, [comes
 - **Environment Variables**
   `AWS_ACCESS_KEY_ID`,` AWS_SECRET_ACCESS_KEY`, etc.
 - **Shared configuration files**
-  Files located in `~/.aws/` such as `config` and `credentials`.
+  Files located in `~/.aws/` such as `config` and `credentials`. This is further influenced by which **profile** is specified as configuration profiles can be inherited and reference one another.
 - **IAM role via ECS Task Metadata**
   For processes running as ECS tasks, or in an environment that emulates the ECS Task Metadata interface (like `aws-vault`).
 - **IAM role via EC2 Instance Metadata**
