@@ -1,6 +1,6 @@
 # S3 backend setup via CloudFormation
 
-Initially setup and customize the Terraform S3 backend with through CloudFormation. This method is best suited for situations where you do not wish to manage your AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
+Setup and customize the Terraform S3 backend with through CloudFormation. This method is best suited for situations where you do not wish to manage your AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
 
 Using the AWS Command Line Interface run the following for the default setup:
 
@@ -13,7 +13,15 @@ aws cloudformation deploy \
 
 ## Customizable Parameters
 
-There are a small number of parameters that let you customize your S3 backend deployment. These parameters may be set on the command line with the `--parameter-overrides` flag. Multiple parameters may be specified by providing multiple, quoted `"Key1=Value1" "Key2=Value2"` pairs.
+There are a small number of parameters that let you customize your S3 backend deployment. These parameters may be set on the command line with the `--parameter-overrides` flag. Multiple parameters may be specified by providing quoted `"Key1=Value1" "Key2=Value2" ...` pairs. For example;
+
+```
+aws cloudformation deploy \
+  --stack-name terraform-bootstrap \
+  --template-file terraform-bootstrap.yaml \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "S3BucketName=MyCustomBucketName" "DynamoDbTableName=my-table-name"
+```
 
 ### S3 Bucket Name
 
