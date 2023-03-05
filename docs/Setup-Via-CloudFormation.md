@@ -1,6 +1,6 @@
 # S3 backend setup via CloudFormation
 
-Initially setup and customize the Terraform S3 backend with through CloudFormation. This method is best suited for situations where you do not wish to manage AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
+Initially setup and customize the Terraform S3 backend with through CloudFormation. This method is best suited for situations where you do not wish to manage your AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
 
 Using the AWS Command Line Interface run the following for the default setup:
 
@@ -21,12 +21,12 @@ When left empty this will cause a new S3 bucket to be created with a somewhat ra
 
 ### S3 State Prefix
 
-Overrides the default key prefix in the S3 bucket which stores your Terraform state objects. Set to `/terraform-state` by default, you may customize this to be `/my/custom/S3/key/prefix` by specifying `S3StatePrefix=my/custom/S3/key/prefix` (note the omitted leading `/`).
+Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) in the S3 bucket which stores your Terraform state objects. Set to `/terraform-state` by default, you may customize this to be `/my/custom/S3/key/prefix` by specifying `S3StatePrefix=my/custom/S3/key/prefix` (note the omitted leading `/`).
 
 ### DynamocDB Lock Table Name
 
-Specify `DynamoDbTableName=my-table-name` to override the default DynamocDB table name (`terraform-locking`).
+Specify `DynamoDbTableName=my-table-name` to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name (`terraform-locking`).
 
 ### SSM Parameter Store Prefix
 
-Override the prefix of the SSM Parameter Store values that are created to store the S3 bucket name and DynamoDB table. Specify `"ParameterPrefix=my/param/prefix"` (note the omitted leading `/`).
+Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table. Specify `"ParameterPrefix=my/param/prefix"` (note the omitted leading `/`).
