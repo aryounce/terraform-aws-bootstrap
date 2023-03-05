@@ -50,9 +50,6 @@ terraform {
     bucket         = "terraform-bootstrap-bucket-XXXXXXXXXXXXX"
     key            = "terraform-state/terraform.tfstate"
     dynamodb_table = "terraform-locking"
-
-    // The following settings should target the 'administrative' AWS account that
-    // holds your Terraform state.
     region         = "us-east-1"
     profile        = "admin-acct-profile"
   }
