@@ -1,5 +1,7 @@
 # IAM Credentials for the Terraform S3 Backend
 
+> This document is a work-in-progress.
+
 When using the S3 backend to store state for Terraform-managed AWS infrastructure it is important to distinguish betwen the "administrative" AWS account and other AWS accounts that Terraform acts on. The S3 backend configuration is flexible enough to enable most AWS authentication scenarios.
 
 This document convers the basic use cases and the reader is encouraged to review the [Credentials and Shared Configuration section](https://developer.hashicorp.com/terraform/language/settings/backends/s3#credentials-and-shared-configuration) of the Terraform S3 Backend Configuration documentation.
