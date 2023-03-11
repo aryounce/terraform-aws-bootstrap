@@ -27,6 +27,12 @@ variable "s3_bucket_name" {
   description = "Name for the S3 bucket created to store Terraform state."
 }
 
+variable "s3_key_prefix" {
+  type        = string
+  default     = null
+  description = "Key prefix for the Terraform state objects in the S3 bucket."
+}
+
 variable "dynamo_table_name" {
   type        = string
   default     = "terraform-locking"
@@ -34,8 +40,8 @@ variable "dynamo_table_name" {
 }
 
 variable "iam_policy_name" {
-  type = string
-  default = "Terraform-S3-Backend"
+  type        = string
+  default     = "Terraform-S3-Backend"
   description = "Name for the IAM policy enabling access to the backend."
 }
 
@@ -86,7 +92,7 @@ resource "aws_s3_bucket" "terraform_state_bucket" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -124,7 +130,7 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -156,7 +162,7 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
           "s3:PutObject",
           "s3:DeleteObject"
         ]
-        Resource = "${aws_s3_bucket.terraform_state_bucket.arn}/*"
+        Resource = can(var.s3_key_prefix) ? "${aws_s3_bucket.terraform_state_bucket.arn}/${var.s3_key_prefix}/*" : "${aws_s3_bucket.terraform_state_bucket.arn}/*"
       },
       {
         Sid    = "Locking"
@@ -195,6 +201,17 @@ resource "aws_ssm_parameter" "terraform_state_bucket" {
   type        = "String"
   description = "Bucket used for Terraform S3 backend deployment(s)."
   value       = aws_s3_bucket.terraform_state_bucket.id
+
+  tags = {
+    application = "Terraform S3 Backend"
+  }
+}
+
+resource "aws_ssm_parameter" "terraform_state_key_prefix" {
+  name        = "/${var.parameter_prefix}/s3-backend-prefix"
+  type        = "String"
+  description = "Key prefix for Terraform state."
+  value       = var.s3_key_prefix
 
   tags = {
     application = "Terraform S3 Backend"
