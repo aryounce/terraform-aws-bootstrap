@@ -47,18 +47,19 @@ The included [`generate-backend-hcl.sh`](generate-backend-hcl.sh) script will pu
 ```hcl
 terraform {
   backend "s3" {
+    region         = "us-east-1"
+    profile        = "admin-acct-profile"
+
     bucket         = "terraform-bootstrap-bucket-XXXXXXXXXXXXX"
     key            = "terraform-state/terraform.tfstate"
     dynamodb_table = "terraform-locking"
-    region         = "us-east-1"
-    profile        = "admin-acct-profile"
   }
 }
 ```
 
 ### IAM Authentication for Multiple AWS Accounts
 
-When using the S3 backend to store state for managing multiple AWS accounts you will need to authenticate against both the administrative AWS account with *background* credentials and the AWS account you wish to manage with *foreground* credentials. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
+When using the S3 backend to store state for managing multiple AWS accounts you will need to authenticate against both the administrative AWS account with *background* credentials (from the CLI profile specified in the backend configuration) and the AWS account you wish to manage with *foreground* credentials. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
 
 ## Related Reading
 
