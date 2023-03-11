@@ -1,6 +1,6 @@
 # S3 backend setup via CloudFormation
 
-Setup and customize the Terraform S3 backend with through CloudFormation. This method is best suited for situations where you do not wish to manage your AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
+Setup and customize the Terraform S3 backend through CloudFormation. This method is best suited for situations where you do not wish to manage your AWS infrastructure through Terraform or do not wish to comingle your S3 backend resources with the rest of your AWS infrastructure.
 
 Using the [AWS Command Line Interface](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudformation/deploy.html) run the following for the default setup:
 
@@ -39,7 +39,7 @@ When left empty this will cause a new S3 bucket to be created with a somewhat ra
 
 Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) in the S3 bucket which stores your Terraform state objects. Set to `/terraform-state` by default, you may customize this to be `/my/custom/S3/key/prefix` by specifying `"S3StatePrefix=my/custom/S3/key/prefix"` (note the omitted leading `/`).
 
-### DynamocDB Lock Table Name
+### DynamoDB Lock Table Name
 
 ```
 "DynamoDbTableName=my-table-name"
