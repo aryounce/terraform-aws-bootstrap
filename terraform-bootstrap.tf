@@ -11,8 +11,8 @@
  */
 
 variable "aws_region" {
-  type    = string
-  default = null
+  type        = string
+  default     = null
   description = "AWS region for the backend resources. Will default to the session region."
 }
 
@@ -22,14 +22,14 @@ variable "aws_region" {
  * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket#bucket
  */
 variable "s3_bucket_name" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "Name for the S3 bucket created to store Terraform state."
 }
 
 variable "dynamo_table_name" {
-  type    = string
-  default = "terraform-locking"
+  type        = string
+  default     = "terraform-locking"
   description = "Name for the DynamocDB table created to lock Terraform state."
 }
 
@@ -92,6 +92,15 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_dynamodb_table" "terraform_lock_table" {
   name     = var.dynamo_table_name
   hash_key = "LockID"
@@ -126,15 +135,15 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "Bucket"
-        Effect   = "Allow"
+        Sid    = "Bucket"
+        Effect = "Allow"
         Action = [
           "s3:ListBucket"
         ]
         Resource = aws_s3_bucket.terraform_state_bucket.arn
       },
       {
-        Sid = "StateAccess"
+        Sid    = "StateAccess"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
@@ -144,7 +153,7 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
         Resource = "${aws_s3_bucket.terraform_state_bucket.arn}/*"
       },
       {
-        Sid = "Locking"
+        Sid    = "Locking"
         Effect = "Allow"
         Action = [
           "dynamodb:GetItem",
@@ -154,7 +163,7 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
         Resource = aws_dynamodb_table.terraform_lock_table.arn
       },
       {
-        Sid = "Parameters"
+        Sid    = "Parameters"
         Effect = "Allow"
         Action = [
           "ssm:DescribeParameters",
