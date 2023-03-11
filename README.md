@@ -58,11 +58,11 @@ terraform {
 
 ### IAM Authentication for Multiple AWS Accounts
 
-When using the S3 backend to store state for managing multiple AWS accounts you will need to authenticate against both the administrative AWS account (which contains the state) and the AWS account you wish to manage. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
-
-See the supplementary document: [IAM Authentication when using the Terraform S3 Backend](docs/S3-Backend-With-IAM.md)
+When using the S3 backend to store state for managing multiple AWS accounts you will need to authenticate against both the administrative AWS account with *background* credentials and the AWS account you wish to manage with *foreground* credentials. Depending on your preferred approach the configuration of the S3 backend may need to be modified.
 
 ## Related Reading
 
 - [Terraform Backend Configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
+  Learn about how Terraform backends work and how to configure them.
 - [Terraform S3 Backend Best Practices](https://technology.doximity.com/articles/terraform-s3-backend-best-practices)
+  A guide to setting up the S3 backend that expands on what this repo offers, and covers additional topics like `tfenv`.
