@@ -39,6 +39,12 @@ Parameters:
       Name for the DynamocDB table created to lock Terraform state.
     Default: "terraform-locking"
 
+  PolicyName:
+    Type: String
+    Description: >-
+      Nmae for the IAM policy that enables access to backend resources.
+    Default: "Terraform-S3-Backend"
+
   #
   # To ensure that the S3 bucket and DynamoDB table are discoverable by scripts
   # and other forms of automation we put their names into well known locations in
@@ -139,7 +145,7 @@ Resources:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       Description: "Terraform S3 backend access."
-      ManagedPolicyName: "Terraform-S3-Backend"
+      ManagedPolicyName: !Ref PolicyName
       PolicyDocument:
         Version: "2012-10-17"
         Statement:

@@ -45,7 +45,15 @@ Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/u
 "DynamoDbTableName=my-table-name"
 ```
 
-Specify `"DynamoDbTableName=my-table-name"` to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name (`terraform-locking`).
+Specify to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name (`terraform-locking`).
+
+### IAM Policy Name
+
+```
+"PolicyName=my-policy-name"
+```
+
+Specify to override the default IAM policy name, which is `Terraform-S3-Backend`.
 
 ### SSM Parameter Store Prefix
 
