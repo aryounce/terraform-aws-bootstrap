@@ -2,14 +2,12 @@
 #
 # Generate Terraform HCL for a S3 backend.
 #
-# Use this to create backend configuration HCL based on the deployed backend.
-# This script will look in the AWS account to which your active credentials
-# belong to.
+# Use this to create backend configuration HCL based on a deployment. This
+# script will look in the AWS account to which your active credentials belong.
 #
 # In case you need to use this for multiple state files or you have deployed
-# mutiple S3 backends you can specify the state name as the first argument to
-# this script, and the SSM Parameter Store path prefix as the second argument
-# to this script.
+# mutiple S3 backends you may specify the state name as the first argument to
+# this script and the SSM Parameter Store path prefix as the second argument.
 #
 # Usage: ./generate-backend-conf.sh [state-name] [ssm-param-path-prefix]
 #
