@@ -12,7 +12,7 @@
 
 variable "aws_region" {
   type        = string
-  default     = null
+  default     = ""
   description = "AWS region for the backend resources. Will default to the session region."
 }
 
@@ -31,6 +31,12 @@ variable "dynamo_table_name" {
   type        = string
   default     = "terraform-locking"
   description = "Name for the DynamocDB table created to lock Terraform state."
+}
+
+variable "iam_policy_name" {
+  type = string
+  default = "Terraform-S3-Backend"
+  description = "Name for the IAM policy enabling access to the backend."
 }
 
 /*
@@ -128,7 +134,7 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
  * https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html
  */
 resource "aws_iam_policy" "terraform_s3_backend_policy" {
-  name        = "Terraform-S3-Backend"
+  name        = var.iam_policy_name
   description = "Terraform S3 backend access."
 
   policy = jsonencode({
