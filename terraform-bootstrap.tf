@@ -178,7 +178,6 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        // TODO Fix this to use the specified region and fall back to the "current"
         Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${var.parameter_prefix}/*"
       }
     ]
