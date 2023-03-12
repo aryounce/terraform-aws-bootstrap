@@ -1,0 +1,241 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Bootstrap the Terraform S3 Backend"
+
+#
+# This CloudFormation stack template initializes all of the resources necessary
+# to utilize the Terraform S3 backend, see;
+# https://www.terraform.io/language/settings/backends/s3
+#
+# These resources are meant to reside in what the Terraform documentation refers
+# to as an "administrative AWS account". See;
+# https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture
+#
+# Note that should this CloudFormation stack be deleted the S3 bucket and
+# DynamoDB table it defines will be retained for safety's sake.
+#
+
+Parameters:
+
+  #
+  # If the `S3BucketName` parameter is left empty then a random name will be
+  # generated that uses this CloudFormation stack's name as a prefix.
+  #
+  S3BucketName:
+    Type: String
+    Description: >-
+      Name for the S3 bucket created to store Terraform state.
+    Default: ""
+
+  S3StatePrefix:
+    Type: String
+    Description: >-
+      Prefix within the S3 bucket to store Terraform state.
+    Default: "terraform-state"
+
+  DynamoDbTableName:
+    Type: String
+    Description: >-
+      Name for the DynamocDB table created to lock Terraform state.
+    Default: "terraform-locking"
+
+  PolicyName:
+    Type: String
+    Description: >-
+      Nmae for the IAM policy that enables access to backend resources.
+    Default: "Terraform-S3-Backend"
+
+  #
+  # To ensure that the S3 bucket and DynamoDB table are discoverable by scripts
+  # and other forms of automation we put their names into well known locations in
+  # Parameter Store.
+  #
+  ParameterPrefix:
+    Type: String
+    Description: >-
+      Prefix (without a leading '/'') for Parameters Store values that can be used
+      to discover the resources in this stack for the purpose of HCL generation, etc.
+    Default: "terraform"
+
+
+Rules:
+
+  StatePrefixConstraint:
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref S3StatePrefix, "" ] ]
+        AssertDescription: >-
+          The S3 prefix for state objects may not be blank.
+
+  LockingTableNameConstraint:
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref DynamoDbTableName, "" ] ]
+        AssertDescription: >-
+          The name for the DynamoDB locking table may not be blank.
+
+
+Conditions:
+
+  HasSpecifiedS3BucketName: !Not [ !Equals [ !Ref S3BucketName, "" ] ]
+
+
+Resources:
+
+  #
+  # Stores the Terraform state. This bucket may be used as the backend for more
+  # than one remote state instance.
+  #
+  Bucket:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !If [ HasSpecifiedS3BucketName, !Ref S3BucketName, !Ref "AWS::NoValue" ]
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: application
+          Value: "Terraform S3 Backend"
+
+  #
+  # The backend can use a DynamoDB table for locking to prevent races between
+  # different instances of Terraform.
+  #
+  # The layout of this table is buried in the S3 backend documentation, see;
+  # https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-state-locking
+  #
+  # TLDR; "The table must have a partition key named LockID with type of String."
+  #
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Ref DynamoDbTableName
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: application
+          Value: "Terraform S3 Backend"
+
+  #
+  # Attach this policy to an IAM user, group, or role to enable access to the S3
+  # backend, see;
+  # https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html
+  #
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Terraform S3 backend access."
+      ManagedPolicyName: !Ref PolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Bucket"
+            Effect: Allow
+            Action:
+              - "s3:ListBucket"
+            Resource: !GetAtt Bucket.Arn
+          - Sid: "StateAccess"
+            Effect: Allow
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:DeleteObject"
+            Resource: !Sub "${Bucket.Arn}/${S3StatePrefix}/*"
+          - Sid: "Locking"
+            Effect: Allow
+            Action:
+              - "dynamodb:GetItem"
+              - "dynamodb:PutItem"
+              - "dynamodb:DeleteItem"
+            Resource: !GetAtt DynamoTable.Arn
+          - Sid: "Parameters"
+            Effect: Allow
+            Action:
+              - "ssm:DescribeParameters"
+              - "ssm:GetParameter"
+              - "ssm:GetParameterHistory"
+              - "ssm:GetParameters"
+              - "ssm:GetParametersByPath"
+            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParameterPrefix}/*"
+
+  # Side note:
+  # Parameter Store parameters have a different tag format than most
+  # other AWS resources created via CloudFormation. See;
+  # https://stackoverflow.com/questions/69718237/property-validation-failure-value-of-property-tags-does-not-match-type-map
+
+  S3BucketParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: >-
+        Bucket used for Terraform S3 backend deployment(s).
+      Name: !Sub "/${ParameterPrefix}/s3-backend-bucket"
+      Tags:
+        application: "Terraform S3 Backend"
+      Tier: Standard
+      Type: "String"
+      Value: !Ref Bucket
+
+  S3KeyPrefixParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: >-
+        Bucket used for Terraform S3 backend deployment(s).
+      Name: !Sub "/${ParameterPrefix}/s3-backend-prefix"
+      Tags:
+        application: "Terraform S3 Backend"
+      Tier: Standard
+      Type: "String"
+      Value: !Ref S3StatePrefix
+
+  DynamoTableParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: >-
+        DynamoDB locking table used for Terraform S3 backend deployment(s).
+      Name: !Sub "/${ParameterPrefix}/s3-backend-lock-table"
+      Tags:
+        application: "Terraform S3 Backend"
+      Tier: Standard
+      Type: "String"
+      Value: !Ref DynamoTable
+
+
+Outputs:
+
+  Bucket:
+    Description: Terrafom state S3 bucket
+    Value: !Ref Bucket
+    Export:
+      Name: !Sub "${AWS::StackName}:bucket-name"
+
+  LockTable:
+    Description: Terraform state lock table
+    Value: !GetAtt DynamoTable.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}:dynamo-table-arn"
+
+  Policy:
+    Description: IAM policy used to access Terraform state
+    Value: !Ref Policy
+    Export:
+      Name: !Sub "${AWS::StackName}:policy-arn"
