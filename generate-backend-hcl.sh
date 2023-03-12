@@ -25,7 +25,7 @@ set -eu -o pipefail
 }
 
 echo "# Generating Terraform HCL for S3 backend" >> /dev/stderr
-echo "# > Usage: $0 [state-name] [ssm-param-path-prefix]"
+echo "# > Usage: $0 [state-name] [ssm-param-path-prefix]" >> /dev/stderr
 
 # Name of the state object in S3. Will have a .tfstate suffix in the bucket.
 state_name_default="terraform"
