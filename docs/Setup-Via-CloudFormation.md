@@ -29,7 +29,7 @@ aws cloudformation deploy \
 "S3BucketName=MyCustomBucketName"
 ```
 
-When left empty this will cause a new S3 bucket to be created with a somewhat random, but unique name. You may override this with your own existing or new S3 bucket name by specifying `"S3BucketName=MyCustomBucketName"`.
+When left empty this will cause a new S3 bucket to be created with a somewhat random, but unique name.
 
 ### S3 State Prefix
 
@@ -37,7 +37,7 @@ When left empty this will cause a new S3 bucket to be created with a somewhat ra
 "S3StatePrefix=my/custom/S3/key/prefix"
 ```
 
-Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) in the S3 bucket which stores your Terraform state objects. Set to `/terraform-state` by default, you may customize this to be `/my/custom/S3/key/prefix` by specifying `"S3StatePrefix=my/custom/S3/key/prefix"` (note the omitted leading `/`).
+Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) in the S3 bucket which stores your Terraform state objects, which is `/terraform-state` by default. When overriding please omit the leading `/`.
 
 ### DynamoDB Lock Table Name
 
@@ -45,7 +45,7 @@ Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/u
 "DynamoDbTableName=my-table-name"
 ```
 
-Specify to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name (`terraform-locking`).
+Specify to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name, which is `terraform-locking`.
 
 ### IAM Policy Name
 
@@ -53,7 +53,7 @@ Specify to override the default [DynamoDB table](https://docs.aws.amazon.com/ama
 "PolicyName=my-policy-name"
 ```
 
-Specify to override the default IAM policy name, which is `Terraform-S3-Backend`.
+Specify to override the default name for the generated IAM policy, which is `Terraform-S3-Backend`.
 
 ### SSM Parameter Store Prefix
 
@@ -61,4 +61,4 @@ Specify to override the default IAM policy name, which is `Terraform-S3-Backend`
 "ParameterPrefix=my/param/prefix"
 ```
 
-Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table. Set to `/terraform` by default, you may customize this to be `/my/param/prefix` by specifying `"ParameterPrefix=my/param/prefix"` (note the omitted leading `/`).
+Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table, which is `/terraform` by default. When overriding please omit the leading `/`.
