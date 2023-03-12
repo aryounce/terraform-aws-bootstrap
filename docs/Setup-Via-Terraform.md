@@ -56,4 +56,10 @@ Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/sys
 
 When setting up the S3 backend using Terraform the state is stored locally and must be [migrated into the backend afterwards](https://developer.hashicorp.com/terraform/cli/commands/init#backend-initialization) (unless you wish to store the backend's state locally).
 
-TODO: Show full process.
+Once your backend configuration has been setup (see the project README for more information) you may then run the following to migrate your local state into the S3 backend:
+
+```shell
+terraform init -migrate-state
+```
+
+You will be prompted for confirmation by Terraform, the backend will be initialized, and your local state will be copied into the new backend.
