@@ -162,7 +162,7 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
           "s3:PutObject",
           "s3:DeleteObject"
         ]
-        Resource = can(var.s3_key_prefix) ? "${aws_s3_bucket.terraform_state_bucket.arn}/${var.s3_key_prefix}/*" : "${aws_s3_bucket.terraform_state_bucket.arn}/*"
+        Resource = var.s3_key_prefix != null ? "${aws_s3_bucket.terraform_state_bucket.arn}/${var.s3_key_prefix}/*" : "${aws_s3_bucket.terraform_state_bucket.arn}/*"
       },
       {
         Sid    = "Locking"
@@ -211,7 +211,7 @@ resource "aws_ssm_parameter" "terraform_state_key_prefix" {
   name        = "/${var.parameter_prefix}/s3-backend-prefix"
   type        = "String"
   description = "Key prefix for Terraform state."
-  value       = var.s3_key_prefix
+  value       = var.s3_key_prefix != null ? var.s3_key_prefix : ""
 
   tags = {
     application = "Terraform S3 Backend"
