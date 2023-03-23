@@ -65,3 +65,4 @@ When using the S3 backend to store state for managing multiple AWS accounts you 
 
 - [Terraform Backend Configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration) → Learn about how Terraform backends work and how to configure them.
 - [Terraform S3 Backend Best Practices](https://technology.doximity.com/articles/terraform-s3-backend-best-practices) → A guide to setting up the S3 backend that expands on what this repo offers, and covers additional topics like `tfenv`.
+- [How to Manage Terraform S3 Backend – Best Practices](https://spacelift.io/blog/terraform-s3-backend) → An alternate guide to setting up your remote state with the S3 backend.
