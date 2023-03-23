@@ -25,7 +25,7 @@ terraform apply
 
 ### Via CloudFormation
 
-Use the [CloudFormation template](terraform-bootstrap.yaml) when either you don't intend to manage you AWS resources with Terraform, but wish to store your state in S3, or you wish to keep your backend resources outside of your Terraform state.
+Use the [CloudFormation template](terraform-bootstrap.yaml) when either you don't intend to manage your AWS resources with Terraform, but wish to store your state in S3, or you wish to keep your backend resources outside of your Terraform state.
 
 For full instructions, see: [S3 backend setup via CloudFormation](docs/Setup-Via-CloudFormation.md)
 
