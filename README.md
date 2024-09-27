@@ -4,7 +4,7 @@ Quickly get started with the [Terraform S3 backend](https://developer.hashicorp.
 
 These Terraform and CloudFormation templates solve the chicken-and-egg problem with the Terraform S3 backend by setting up all of the resources needed in the "administrative AWS account" so that Terraform may be used safely in a [multi-account, multi-user setup](https://developer.hashicorp.com/terraform/language/settings/backends/s3#multi-account-aws-architecture). This includes:
 
-- An S3 bucket for Terraform state.
+- A S3 bucket for Terraform state.
 - A DynamoDB table for managing the state lock.
 - A pre-built IAM policy that can be used for enabling access to the S3 backend.
 - SSM Parameter Store values to make the S3 bucket name and DynamoDB table name accessible to other automation.
@@ -49,7 +49,6 @@ terraform {
   backend "s3" {
     region         = "us-east-1"
     profile        = "admin-acct-profile"
-
     bucket         = "terraform-bootstrap-bucket-XXXXXXXXXXXXX"
     key            = "terraform-state/terraform.tfstate"
     dynamodb_table = "terraform-locking"
