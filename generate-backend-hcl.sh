@@ -53,10 +53,11 @@ aws ssm get-parameters-by-path --output json --path "/${param_prefix}/" \
 $'if (.Parameters | length) > 0
 then .Parameters | "terraform {
   backend \\"s3\\" {
-    profile        = \\"default\\"  // Change this to a CLI profile dedicated to the admin account.
+    //profile        = \\"default\\"  // Change this to a CLI profile dedicated to the admin account.
 
     bucket         = \\"\(.[] | select(.Name | test(\"/s3-backend-bucket$\")) | .Value)\\"
     key            = \\"\(.[] | select(.Name | test(\"/s3-backend-prefix$\")) | .Value)/\($state_name).tfstate\\"
+    use_lockfile   = true
 
     // Use of S3 bucket encryption must be enable by the user.
     //encrypt        = true
