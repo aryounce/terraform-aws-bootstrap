@@ -21,3 +21,6 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+
+# Local development resources that should not be committed.
+backend.tf
