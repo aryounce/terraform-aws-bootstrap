@@ -33,6 +33,12 @@ variable "s3_key_prefix" {
   description = "Key prefix for the Terraform state objects in the S3 bucket."
 }
 
+variable "s3_bucket_versioning" {
+  type        = bool
+  default     = true
+  description = "Optionally enable S3 object versioning on the backend's bucket."
+}
+
 variable "iam_policy_name" {
   type        = string
   default     = "Terraform-S3-Backend"
@@ -85,7 +91,9 @@ resource "aws_s3_bucket" "terraform_state_bucket" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    # This is set to false to enable testing. Set this to `true` when deploying
+    # in a production environment.
+    prevent_destroy = false
   }
 }
 
@@ -93,7 +101,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state_bucket.id
 
   versioning_configuration {
-    status = "Enabled"
+    status = var.s3_bucket_versioning ? "Enabled" : "Disabled"
   }
 }
 
