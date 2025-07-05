@@ -25,21 +25,21 @@ set -eu -o pipefail
 }
 
 echo "# Generating Terraform HCL for S3 backend" >> /dev/stderr
-echo "# > Usage: $0 [state-name] [ssm-param-path-prefix]" >> /dev/stderr
-
-# Name of the state object in S3. Will have a .tfstate suffix in the bucket.
-state_name_default="terraform"
-state_name=${1-$state_name_default}
-
-[[ "${state_name}" == "${state_name_default}" ]] && \
-  echo "# > Using default Terraform state name: '${state_name}'" >> /dev/stderr
+echo "# > Usage: $0 [ssm-param-path-prefix] [state-name]" >> /dev/stderr
 
 # SSM Parameter Store path prefix (for locating values needed by this script)
 param_prefix_default="terraform"
-param_prefix="$(echo ${2-${param_prefix_default}} | sed -E 's#^/*(.*[^/])/?/*$#\1#')"
+param_prefix="$(echo ${1-${param_prefix_default}} | sed -E 's#^/*(.*[^/])/?/*$#\1#')"
 
 [[ "${param_prefix}" == "${param_prefix_default}" ]] && \
-  echo "# > Using default Terraform SSM parameter path: '${param_prefix}'" >> /dev/stderr
+  echo "# > Using *default* Terraform SSM parameter path: '${param_prefix}'" >> /dev/stderr
+
+# Name of the state object in S3. Will have a .tfstate suffix in the bucket.
+state_name_default="terraform"
+state_name=${2-$state_name_default}
+
+[[ "${state_name}" == "${state_name_default}" ]] && \
+  echo "# > Using *default* Terraform state name: '${state_name}'" >> /dev/stderr
 
 echo "# Reading parameters from SSM Parameter Store prefix: /${param_prefix}/" >> /dev/stderr
 
