@@ -57,7 +57,6 @@ then .Parameters | "terraform {
 
     bucket         = \\"\(.[] | select(.Name | test(\"/s3-backend-bucket$\")) | .Value)\\"
     key            = \\"\(.[] | select(.Name | test(\"/s3-backend-prefix$\")) | .Value)/\($state_name).tfstate\\"
-    dynamodb_table = \\"\(.[] | select(.Name | test(\"/s3-backend-lock-table$\")) | .Value)\\"
 
     // Use of S3 bucket encryption must be enable by the user.
     //encrypt        = true

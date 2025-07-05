@@ -33,12 +33,6 @@ variable "s3_key_prefix" {
   description = "Key prefix for the Terraform state objects in the S3 bucket."
 }
 
-variable "dynamo_table_name" {
-  type        = string
-  default     = "terraform-locking"
-  description = "Name for the DynamocDB table created to lock Terraform state."
-}
-
 variable "iam_policy_name" {
   type        = string
   default     = "Terraform-S3-Backend"
@@ -47,8 +41,7 @@ variable "iam_policy_name" {
 
 /*
  * SSM Parameter Store values are created to provide a well-known place for
- * scripts and other automation to retieve the S3 bucket name and DynamocDB table
- * name.
+ * scripts and other automation to retieve the S3 bucket name and prefix.
  */
 variable "parameter_prefix" {
   type    = string
@@ -67,7 +60,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.57.0"
+      version = ">= 6.2.0"
     }
   }
 }
@@ -92,7 +85,7 @@ resource "aws_s3_bucket" "terraform_state_bucket" {
   }
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 }
 
@@ -111,27 +104,6 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}
-
-resource "aws_dynamodb_table" "terraform_lock_table" {
-  name     = var.dynamo_table_name
-  hash_key = "LockID"
-
-  billing_mode = "PAY_PER_REQUEST"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  tags = {
-    Name        = "Terraform S3 Backend - Locking"
-    application = "Terraform S3 Backend"
-  }
-
-  lifecycle {
-    prevent_destroy = false
-  }
 }
 
 /*
@@ -163,16 +135,6 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
           "s3:DeleteObject"
         ]
         Resource = var.s3_key_prefix != null ? "${aws_s3_bucket.terraform_state_bucket.arn}/${var.s3_key_prefix}/*" : "${aws_s3_bucket.terraform_state_bucket.arn}/*"
-      },
-      {
-        Sid    = "Locking"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem"
-        ]
-        Resource = aws_dynamodb_table.terraform_lock_table.arn
       },
       {
         Sid    = "Parameters"
@@ -212,17 +174,6 @@ resource "aws_ssm_parameter" "terraform_state_key_prefix" {
   type        = "String"
   description = "Key prefix for Terraform state."
   value       = var.s3_key_prefix != null ? var.s3_key_prefix : ""
-
-  tags = {
-    application = "Terraform S3 Backend"
-  }
-}
-
-resource "aws_ssm_parameter" "terraform_lock_table" {
-  name        = "/${var.parameter_prefix}/s3-backend-lock-table"
-  type        = "String"
-  description = "DynamoDB locking table used for Terraform S3 backend deployment(s)."
-  value       = aws_dynamodb_table.terraform_lock_table.id
 
   tags = {
     application = "Terraform S3 Backend"
