@@ -25,21 +25,21 @@ set -eu -o pipefail
 }
 
 echo "# Generating Terraform HCL for S3 backend" >> /dev/stderr
-echo "# > Usage: $0 [state-name] [ssm-param-path-prefix]" >> /dev/stderr
-
-# Name of the state object in S3. Will have a .tfstate suffix in the bucket.
-state_name_default="terraform"
-state_name=${1-$state_name_default}
-
-[[ "${state_name}" == "${state_name_default}" ]] && \
-  echo "# > Using default Terraform state name: '${state_name}'" >> /dev/stderr
+echo "# > Usage: $0 [ssm-param-path-prefix] [state-name]" >> /dev/stderr
 
 # SSM Parameter Store path prefix (for locating values needed by this script)
 param_prefix_default="terraform"
-param_prefix="$(echo ${2-${param_prefix_default}} | sed -E 's#^/*(.*[^/])/?/*$#\1#')"
+param_prefix="$(echo ${1-${param_prefix_default}} | sed -E 's#^/*(.*[^/])/?/*$#\1#')"
 
 [[ "${param_prefix}" == "${param_prefix_default}" ]] && \
-  echo "# > Using default Terraform SSM parameter path: '${param_prefix}'" >> /dev/stderr
+  echo "# > Using *default* Terraform SSM parameter path: '${param_prefix}'" >> /dev/stderr
+
+# Name of the state object in S3. Will have a .tfstate suffix in the bucket.
+state_name_default="terraform"
+state_name=${2-$state_name_default}
+
+[[ "${state_name}" == "${state_name_default}" ]] && \
+  echo "# > Using *default* Terraform state name: '${state_name}'" >> /dev/stderr
 
 echo "# Reading parameters from SSM Parameter Store prefix: /${param_prefix}/" >> /dev/stderr
 
@@ -53,11 +53,13 @@ aws ssm get-parameters-by-path --output json --path "/${param_prefix}/" \
 $'if (.Parameters | length) > 0
 then .Parameters | "terraform {
   backend \\"s3\\" {
-    profile        = \\"default\\"  // Change this to a CLI profile dedicated to the admin account.
+    // Change this to a CLI profile dedicated to the admin account or leave this
+    // out entirely to use the session credentials.
+    //profile        = \\"default\\"
 
     bucket         = \\"\(.[] | select(.Name | test(\"/s3-backend-bucket$\")) | .Value)\\"
     key            = \\"\(.[] | select(.Name | test(\"/s3-backend-prefix$\")) | .Value)/\($state_name).tfstate\\"
-    dynamodb_table = \\"\(.[] | select(.Name | test(\"/s3-backend-lock-table$\")) | .Value)\\"
+    use_lockfile   = true
 
     // Use of S3 bucket encryption must be enable by the user.
     //encrypt        = true

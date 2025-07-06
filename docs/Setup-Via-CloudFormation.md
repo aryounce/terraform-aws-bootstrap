@@ -20,7 +20,7 @@ aws cloudformation deploy \
   --stack-name terraform-bootstrap \
   --template-file terraform-bootstrap.yaml \
   --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=MyCustomBucketName" "DynamoDbTableName=my-table-name"
+  --parameter-overrides "S3BucketName=MyCustomBucketName" "S3StatePrefix=my/custom/S3/key/prefix"
 ```
 
 ### S3 Bucket Name
@@ -39,13 +39,13 @@ When left empty this will cause a new S3 bucket to be created with a somewhat ra
 
 Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) in the S3 bucket which stores your Terraform state objects, which is `/terraform-state` by default. When overriding please omit the leading `/`.
 
-### DynamoDB Lock Table Name
+### S3 Bucket Versioning
 
-```
-"DynamoDbTableName=my-table-name"
+```shell
+"S3Versioning=Disabled"
 ```
 
-Specify to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name, which is `terraform-locking`.
+Enabled by default. You may optionally disable S3 bucket versioning by setting this variable to anything other than `Enabled`.
 
 ### IAM Policy Name
 

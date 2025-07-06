@@ -28,13 +28,13 @@ When left empty this will cause a new S3 bucket to be created with a somewhat ra
 
 Overrides the default [key prefix](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) in the S3 bucket which stores your Terraform state objects. Set to `/terraform-state` by default. Take care to the omitted the leading `/`.
 
-### DynamoDB Lock Table Name
+### S3 Bucket Versioning
 
 ```shell
--var "dynamo_table_name=my-table-name"
+-var "s3_bucket_versioning=false"
 ```
 
-Specify to override the default [DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html) name, which is `terraform-locking`.
+Enabled by default. You may optionally disable S3 bucket versioning by setting this variable to `false`.
 
 ### IAM Policy Name
 
