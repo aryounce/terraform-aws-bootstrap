@@ -61,4 +61,4 @@ Specify to override the default name for the generated IAM policy, which is `Ter
 "ParameterPrefix=my/param/prefix"
 ```
 
-Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table, which is `/terraform` by default. When overriding please omit the leading `/`.
+Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and prefix, which is `/terraform` by default. When overriding please omit the leading `/`.
