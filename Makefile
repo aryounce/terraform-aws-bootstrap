@@ -5,6 +5,7 @@
 # format, which uses JSON for cross-test compatibility.
 
 TF_TEST_TFVARS := test-tf.tfvars.json
+
 CF_TEST_TFVARS := test-cf.tfvars.json
 CF_TEST_STACK := terraform-s3be-bootstrap-test
 
@@ -25,7 +26,7 @@ test-tf-clean:
 	aws s3 rm s3://$(shell jq -r '.s3_bucket_name' < testing/${TF_TEST_TFVARS})/ --recursive
 	@sleep 5
 	terraform destroy -auto-approve -var-file testing/${TF_TEST_TFVARS}
-	rm -rf testing/.terraform .terraform.lock.hcl testing/sample-infra/backend.tf
+	rm -rf testing/.terraform testing/.terraform.lock.hcl testing/sample-infra/backend.tf
 
 test-cf:
 	aws cloudformation deploy \
@@ -52,4 +53,4 @@ test-cf-clean:
 	aws s3 rm s3://$(shell aws cloudformation describe-stack-resource --stack-name ${CF_TEST_STACK} \
 		--logical-resource-id Bucket | jq -r '.StackResourceDetail.PhysicalResourceId')/ --recursive
 	aws cloudformation delete-stack --stack-name terraform-s3be-bootstrap-test
-	rm -rf testing/.terraform .terraform.lock.hcl testing/sample-infra/backend.tf
+	rm -rf testing/.terraform testing/.terraform.lock.hcl testing/sample-infra/backend.tf
