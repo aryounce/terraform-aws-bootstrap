@@ -44,7 +44,7 @@ test-tf-clean:
 # exercise it.
 #
 test-cf:
-	$(info --- Deploying S3 backend with CloudFormation ---)
+	@echo "--- Deploying S3 backend with CloudFormation ---"
 	aws cloudformation deploy \
 		--stack-name ${CF_TEST_STACK} \
 		--template-file terraform-bootstrap.yaml \
@@ -55,18 +55,24 @@ test-cf:
 			S3BucketRetain=Disabled \
 			PolicyName=$(shell jq -r '.iam_policy_name' < testing/${CF_TEST_TFVARS}) \
 			ParameterPrefix=$(shell jq -r '.parameter_prefix' < testing/${CF_TEST_TFVARS})
+	@echo "--- Generating Terraform backend config for sample infrastructure ---"
 	./generate-backend-hcl.sh $(shell jq -r '.parameter_prefix' < testing/${CF_TEST_TFVARS}) \
 		> testing/sample-infra/backend.tf
+	@echo "--- Deploying sample infrastructure ---"
 	cd testing/sample-infra && \
 		terraform init -reconfigure && \
 		terraform apply -auto-approve -var 'sample_ssm_parameter_prefix=test-cf' && \
 		terraform show
 
 test-cf-clean:
+	@echo "--- Tearing down sample infrastructure ---"
 	cd testing/sample-infra && \
 		terraform destroy -auto-approve -var 'sample_ssm_parameter_prefix=test-cf' && \
 		terraform show
+	@echo "--- Clearing all objects from backend S3 bucket ---"
 	aws s3 rm s3://$(shell aws cloudformation describe-stack-resource --stack-name ${CF_TEST_STACK} \
 		--logical-resource-id Bucket | jq -r '.StackResourceDetail.PhysicalResourceId')/ --recursive
+	@echo "--- Tearing down S3 backend infrastructure ---"
 	aws cloudformation delete-stack --stack-name terraform-s3be-bootstrap-test
+	@echo "--- Cleaning up local S3 backend state ---"
 	rm -rf testing/.terraform testing/.terraform.lock.hcl testing/sample-infra/backend.tf
