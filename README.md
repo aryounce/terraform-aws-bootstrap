@@ -59,7 +59,7 @@ terraform {
 
 Although omitted in the above example it is advised that you, at a minimum, use [server-side encryption with AWS managed keys](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html) to protect your Terraform state. Secrets are sometimes included in state data, depending on the provider, and should at least be protected to the level offered by the [AWS Key Manamgement Service](https://docs.aws.amazon.com/kms/latest/developerguide/data-protection.html).
 
-As of January 5th, 2025 all *new and existing* S3 buckets will use a default KMS bucket key to encrypt all uploaded objects (existing objects will not have server-side encryption applied). When creating a new S3 bucket with the code included in this repository you do not need to enable KMS keys (unless you wish) as Amazon S3 will automatically manage the default bucket key for you.
+As of January 5th, 2025 all *new and existing* S3 buckets will use a default S3-managed key to encrypt all uploaded objects (existing objects will not have server-side encryption applied). When creating a new S3 bucket with the code included in this repository you do not need to enable KMS keys (unless you wish) as Amazon S3 will automatically manage the default bucket key for you.
 
 #### Addtional Reading
 
