@@ -39,6 +39,12 @@ Parameters:
       Optionally enable S3 object versioning on the backend's bucket.
     Default: "Enabled"
 
+  S3BucketRetain:
+    Type: String
+    Description: >-
+      Optionally retain the backend's S3 bucket when deleting this Stack.
+    Default: "Enabled"
+
   #
   # To ensure that the S3 bucket and prefix are discoverable by scripts
   # and other forms of automation we put their names into well known locations in
@@ -70,6 +76,7 @@ Rules:
 Conditions:
 
   HasSpecifiedS3BucketName: !Not [ !Equals [ !Ref S3BucketName, "" ] ]
+  ShouldRetainS3Bucket: !Equals [ !Ref S3BucketRetain, "Enabled" ]
   ShouldEnableS3ObjectVersioning: !Equals [ !Ref S3Versioning, "Enabled" ]
 
 
@@ -82,7 +89,7 @@ Resources:
   Bucket:
     Type: AWS::S3::Bucket
     UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
+    DeletionPolicy: !If [ ShouldRetainS3Bucket, "Retain", "Delete" ]
     Properties:
       BucketName: !If [ HasSpecifiedS3BucketName, !Ref S3BucketName, !Ref "AWS::NoValue" ]
       AccessControl: Private

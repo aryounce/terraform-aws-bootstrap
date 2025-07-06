@@ -35,6 +35,7 @@ test-cf:
 		--parameter-overrides \
 			S3StatePrefix=$(shell jq -r '.s3_key_prefix' < testing/${CF_TEST_TFVARS}) \
 			S3Versioning=Disabled \
+			S3BucketRetain=Disabled \
 			PolicyName=$(shell jq -r '.iam_policy_name' < testing/${CF_TEST_TFVARS}) \
 			ParameterPrefix=$(shell jq -r '.parameter_prefix' < testing/${CF_TEST_TFVARS})
 	./generate-backend-hcl.sh $(shell jq -r '.parameter_prefix' < testing/${CF_TEST_TFVARS}) \
