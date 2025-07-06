@@ -9,26 +9,42 @@ TF_TEST_TFVARS := test-tf.tfvars.json
 CF_TEST_TFVARS := test-cf.tfvars.json
 CF_TEST_STACK := terraform-s3be-bootstrap-test
 
+#
+# Setup an S3 backend using Terraform and create sample infrastructure to
+# exercise it.
+#
 test-tf:
+	@echo "--- Deploying S3 backend with Terraform ---"
 	terraform init -reconfigure && \
 	terraform apply -auto-approve -var-file testing/${TF_TEST_TFVARS} -var 's3_bucket_versioning=false'
+	@echo "--- Generating Terraform backend config for sample infrastructure ---"
 	./generate-backend-hcl.sh $(shell jq -r '.parameter_prefix' < testing/${TF_TEST_TFVARS}) \
 		> testing/sample-infra/backend.tf
+	@echo "--- Deploying sample infrastructure ---"
 	cd testing/sample-infra && \
 		terraform init -reconfigure && \
 		terraform apply -auto-approve -var 'sample_ssm_parameter_prefix=test-tf' && \
 		terraform show
 
 test-tf-clean:
+	@echo "--- Tearing down sample infrastructure ---"
 	cd testing/sample-infra && \
 		terraform destroy -auto-approve -var 'sample_ssm_parameter_prefix=test-tf' && \
 		terraform show
+	@echo "--- Clearing all objects from backend S3 bucket ---"
 	aws s3 rm s3://$(shell jq -r '.s3_bucket_name' < testing/${TF_TEST_TFVARS})/ --recursive
 	@sleep 5
+	@echo "--- Tearing down S3 backend infrastructure ---"
 	terraform destroy -auto-approve -var-file testing/${TF_TEST_TFVARS}
+	@echo "--- Cleaning up local S3 backend state ---"
 	rm -rf testing/.terraform testing/.terraform.lock.hcl testing/sample-infra/backend.tf
 
+#
+# Setup an S3 backend using CloudFormation and create sample infrastructure to
+# exercise it.
+#
 test-cf:
+	$(info --- Deploying S3 backend with CloudFormation ---)
 	aws cloudformation deploy \
 		--stack-name ${CF_TEST_STACK} \
 		--template-file terraform-bootstrap.yaml \
