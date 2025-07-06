@@ -20,7 +20,7 @@ aws cloudformation deploy \
   --stack-name terraform-bootstrap \
   --template-file terraform-bootstrap.yaml \
   --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=MyCustomBucketName"
+  --parameter-overrides "S3BucketName=MyCustomBucketName" "S3StatePrefix=my/custom/S3/key/prefix"
 ```
 
 ### S3 Bucket Name
