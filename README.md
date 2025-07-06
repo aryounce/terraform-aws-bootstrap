@@ -50,6 +50,7 @@ terraform {
     profile        = "admin-acct-profile"
     bucket         = "terraform-bootstrap-bucket-XXXXXXXXXXXXX"
     key            = "terraform-state/terraform.tfstate"
+    use_lockfile   = true
   }
 }
 ```
