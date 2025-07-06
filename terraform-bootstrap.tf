@@ -161,8 +161,8 @@ resource "aws_iam_policy" "terraform_s3_backend_policy" {
 }
 
 /*
- * To ensure that the S3 bucket and DynamoDB table are discoverable by scripts
- * and other forms of automation we put their names into well known locations in
+ * To ensure that the S3 bucket and prefix are discoverable by scripts and other
+ * forms of automation we put their names into well known locations in
  * Parameter Store.
  */
 

@@ -50,7 +50,7 @@ Specify to override the default IAM policy name, which is `Terraform-S3-Backend`
 -var "parameter_prefix=my/param/prefix"
 ```
 
-Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and DynamoDB table. Set to `/terraform` by default. Take care to the omitted the leading `/`.
+Override the prefix of the [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) values that are created to store the S3 bucket name and prefix. Set to `/terraform` by default. Take care to the omitted the leading `/`.
 
 ## Migration into the S3 backend
 
