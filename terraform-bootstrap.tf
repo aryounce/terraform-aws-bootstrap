@@ -178,10 +178,11 @@ resource "aws_ssm_parameter" "terraform_state_bucket" {
 }
 
 resource "aws_ssm_parameter" "terraform_state_key_prefix" {
+  count       = var.s3_key_prefix != null ? 1 : 0
   name        = "/${var.parameter_prefix}/s3-backend-prefix"
   type        = "String"
   description = "Key prefix for Terraform state."
-  value       = var.s3_key_prefix != null ? var.s3_key_prefix : ""
+  value       = var.s3_key_prefix
 
   tags = {
     application = "Terraform S3 Backend"
