@@ -48,18 +48,19 @@ echo "# Reading parameters from SSM Parameter Store prefix: /${param_prefix}/" >
 # is greater than zero. Whether or not the expected parameters are returned is
 # not (yet) handled gracefully.
 #
-aws ssm get-parameters-by-path --output json --path "/${param_prefix}/" \
+aws ssm get-parameters-by-path --output json --path "/${param_prefix}" \
 | jq -r --arg state_name "${state_name}" --arg param_prefix "${param_prefix}" \
 $'if (.Parameters | length) > 0
-then .Parameters | "terraform {
+then (.Parameters | map({ (.Name | tostring | trimstr("/") | ltrimstr($param_prefix) | trimstr("/")): .Value }) | add) |
+"terraform {
   backend \\"s3\\" {
     // Change this to a CLI profile dedicated to the admin account or leave this
     // out entirely to use the session credentials.
-    //profile        = \\"default\\"
+    //profile       = \\"default\\"
 
-    bucket         = \\"\(.[] | select(.Name | test(\"/s3-backend-bucket$\")) | .Value)\\"
-    key            = \\"\(.[] | select(.Name | test(\"/s3-backend-prefix$\")) | .Value)/\($state_name).tfstate\\"
-    use_lockfile   = true
+    bucket        = \\"\(."s3-backend-bucket")\\"
+    key           = \\"\(if ."s3-backend-prefix" then ."s3-backend-prefix" + "/" else "" end)\($state_name).tfstate\\"
+    use_lockfile  = true
 
     // Use of S3 bucket encryption must be enable by the user.
     //encrypt        = true
